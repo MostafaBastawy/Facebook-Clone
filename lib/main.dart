@@ -1,12 +1,15 @@
 import 'package:facebook_clone/cubit/bloc_observing.dart';
 import 'package:facebook_clone/cubit/cubit.dart';
-import 'package:facebook_clone/screens/home_layout.dart';
+import 'package:facebook_clone/screens/login_screen.dart';
 import 'package:facebook_clone/shared/constants.dart';
+import 'package:facebook_clone/shared/shared_prefrence.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = MyBlocObserver();
+  await CacheHelper.init();
   runApp(const MyApp());
 }
 
@@ -22,7 +25,7 @@ class MyApp extends StatelessWidget {
         theme: lightMode,
         darkTheme: darkMode,
         themeMode: ThemeMode.light,
-        home: const HomeLayout(),
+        home: LoginScreen(),
       ),
     );
   }

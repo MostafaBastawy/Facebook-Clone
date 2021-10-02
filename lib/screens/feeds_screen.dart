@@ -41,7 +41,7 @@ class FeedsScreen extends StatelessWidget {
                 ),
               ),
               myDivider(),
-              //This Card for creating new story
+              //This section for creating new story
               Container(
                 height: 200.0,
                 child: ListView.separated(
@@ -58,6 +58,19 @@ class FeedsScreen extends StatelessWidget {
                 ),
               ),
               myDivider(),
+              //This section for listing new posts
+              ListView.separated(
+                physics: const BouncingScrollPhysics(),
+                shrinkWrap: true,
+                scrollDirection: Axis.vertical,
+                itemBuilder: (BuildContext context, int index) {
+                  return buildPostItem(context);
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return  myDivider();
+                },
+                itemCount: 10,
+              ),
             ],
           ),
         );
@@ -141,6 +154,7 @@ class FeedsScreen extends StatelessWidget {
           ),
         ),
       );
+
   Widget buildStoryItem() => Padding(
         padding: const EdgeInsets.only(bottom: 10.0, top: 10.0),
         child: Stack(
@@ -206,5 +220,99 @@ class FeedsScreen extends StatelessWidget {
             ),
           ],
         ),
+      );
+
+  Widget buildPostItem(BuildContext context) => Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              children: [
+                const CircleAvatar(
+                  radius: 25.0,
+                  backgroundImage: NetworkImage(
+                      'https://pbs.twimg.com/profile_images/1209274176906752000/5Lne-grQ_400x400.jpg'),
+                ),
+                const SizedBox(width: 10.0),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Mostafa Bastawy',
+                      style: Theme.of(context).textTheme.bodyText1!,
+                    ),
+                    const Text('Post Date'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Container(
+              child: const Text(
+                'Wikis are enabled by wiki software, otherwise known as wiki engines. A wiki engine, being a form of a content management system, differs from other web-based systems such as blog software, in that the content is created without any defined owner or leader, and wikis have little inherent structure, allowing structure to emerge according to the needs of the users',
+                textDirection: TextDirection.ltr,
+                textAlign: TextAlign.start,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: Container(
+              height: 150.0,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(
+                      'https://media.istockphoto.com/photos/giza-pyramids-and-sphinx-in-cairo-egypt-picture-id531252132?b=1&k=20&m=531252132&s=170667a&w=0&h=NP-oxcwq4hvIfz2XIU9ArwUm35QXn3ElmVPwqs9vQTg='),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Row(
+              children: const [
+                Text('120 Likes'),
+                Spacer(),
+                Text('120 Comments'),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Container(
+              height: 1.0,
+              width: double.infinity,
+              color: Colors.grey[100],
+            ),
+          ),
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+            child: Row(
+              children: [
+                Row(
+                  children: const [
+                    Icon(Icons.favorite_border),
+                    const SizedBox(width: 8.0),
+                    Text('Like'),
+                  ],
+                ),
+                const Spacer(),
+                Row(
+                  children: const [
+                    Icon(Icons.chat_bubble_outline),
+                    const SizedBox(width: 8.0),
+                    Text('Comment'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       );
 }

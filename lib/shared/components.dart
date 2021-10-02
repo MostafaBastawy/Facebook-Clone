@@ -26,3 +26,34 @@ void navigateAndFinish({
     (route) => false,
   );
 }
+
+Widget defaultButton({
+  double width = double.infinity,
+  Color background = Colors.blue,
+  bool isUpperCase = true,
+  double radius = 3.0,
+  required Function function,
+  required String text,
+  Color color = Colors.white,
+}) =>
+    Container(
+      width: width,
+      height: 40.0,
+      child: MaterialButton(
+        onPressed: () {
+          function();
+        },
+        child: Text(
+          isUpperCase ? text.toUpperCase() : text,
+          style: TextStyle(
+            color: color,
+          ),
+        ),
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(
+          radius,
+        ),
+        color: background,
+      ),
+    );

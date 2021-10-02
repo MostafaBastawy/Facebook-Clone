@@ -38,6 +38,8 @@ dependencies:
   flutter_bloc: ^7.3.0
   bloc: ^7.2.1
   curved_navigation_bar: ^1.0.1
+  firebase_auth: ^3.1.2
+  firebase_core: ^1.7.0
 
 dev_dependencies:
   flutter_test:

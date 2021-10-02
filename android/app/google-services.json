@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "482278301170",
+    "project_id": "face-book-48c5c",
+    "storage_bucket": "face-book-48c5c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:482278301170:android:426897b37b946d4b1d9f6b",
+        "android_client_info": {
+          "package_name": "com.mostafabastawy.facebook_clone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "482278301170-2pu17fs1hdkhh666ukgktvvcjtr8q300.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAu4_540KeW0coA_249M6x9DQE422kYBxk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "482278301170-2pu17fs1hdkhh666ukgktvvcjtr8q300.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
