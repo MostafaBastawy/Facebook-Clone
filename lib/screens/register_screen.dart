@@ -15,7 +15,11 @@ class RegisterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AppCubit, AppStates>(
-      listener: (BuildContext context, state) {},
+      listener: (BuildContext context, state) {
+        if (state is UserRegisterSuccessfulState) {
+          navigateAndFinish(context: context, widget: LoginScreen());
+        }
+      },
       builder: (BuildContext context, Object? state) {
         AppCubit cubit = AppCubit.get(context);
 
@@ -122,7 +126,16 @@ class RegisterScreen extends StatelessWidget {
                       SizedBox(
                           height: MediaQuery.of(context).size.height * 0.03),
                       defaultButton(
-                        function: () {},
+                        function: () {
+                          if (formKey.currentState!.validate()) {
+                            cubit.userRegister(
+                              name: nameController.text,
+                              email: emailController.text,
+                              password: passwordController.text,
+                              phone: phoneController.text,
+                            );
+                          }
+                        },
                         text: 'Register',
                       ),
                       SizedBox(

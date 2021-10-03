@@ -1,7 +1,10 @@
 import 'package:facebook_clone/cubit/cubit.dart';
 import 'package:facebook_clone/cubit/states.dart';
+import 'package:facebook_clone/screens/home_layout.dart';
 import 'package:facebook_clone/screens/register_screen.dart';
 import 'package:facebook_clone/shared/components.dart';
+import 'package:facebook_clone/shared/shared_prefrence.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,7 +16,13 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AppCubit, AppStates>(
-      listener: (BuildContext context, state) {},
+      listener: (BuildContext context, state) {
+        if (state is UserLoginSuccessfulState) {
+          CacheHelper.setData(
+              key: 'uid', value: FirebaseAuth.instance.currentUser!.uid);
+          navigateAndFinish(context: context, widget: HomeLayout());
+        }
+      },
       builder: (BuildContext context, Object? state) {
         AppCubit cubit = AppCubit.get(context);
         return Scaffold(
@@ -79,7 +88,13 @@ class LoginScreen extends StatelessWidget {
                       SizedBox(
                           height: MediaQuery.of(context).size.height * 0.03),
                       defaultButton(
-                        function: () {},
+                        function: () {
+                          if (formKey.currentState!.validate()) {
+                            cubit.userLogin(
+                                email: emailController.text,
+                                password: passwordController.text);
+                          }
+                        },
                         text: 'LOGIN',
                         color: Colors.white,
                       ),
