@@ -20,8 +20,6 @@ class EditProfileScreen extends StatelessWidget {
     return BlocConsumer<AppCubit, AppStates>(
       listener: (BuildContext context, state) {},
       builder: (BuildContext context, Object? state) {
-
-
         return Scaffold(
           appBar: AppBar(
             title: Text('Edit Profile'),
@@ -46,9 +44,11 @@ class EditProfileScreen extends StatelessWidget {
                               topLeft: Radius.circular(20.0),
                             ),
                             image: DecorationImage(
-                              image: NetworkImage(cubit.coverImage == null
-                                  ? cubit.userDataModel!.coverImage.toString()
-                                  : cubit.coverImage.toString()),
+                              image: cubit.coverImage == null
+                                  ? NetworkImage(
+                                      '${cubit.userDataModel!.coverImage}')
+                                  : FileImage(cubit.coverImage!)
+                                      as ImageProvider,
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -65,10 +65,11 @@ class EditProfileScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(100.0),
                                 image: DecorationImage(
-                                  image: NetworkImage(cubit.profileImage == null
-                                      ? cubit.userDataModel!.profileImage
-                                          .toString()
-                                      : cubit.profileImage.toString()),
+                                  image: cubit.profileImage == null
+                                      ? NetworkImage(
+                                          '${cubit.userDataModel!.profileImage}')
+                                      : FileImage(cubit.profileImage!)
+                                          as ImageProvider,
                                   fit: BoxFit.fill,
                                 ),
                               ),
@@ -152,8 +153,7 @@ class EditProfileScreen extends StatelessWidget {
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   defaultButton(
-                    function: () {
-                    },
+                    function: () {},
                     text: 'Apply Edit',
                   ),
                 ],
