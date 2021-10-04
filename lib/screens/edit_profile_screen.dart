@@ -1,7 +1,6 @@
 import 'package:facebook_clone/cubit/cubit.dart';
 import 'package:facebook_clone/cubit/states.dart';
 import 'package:facebook_clone/shared/components.dart';
-import 'package:facebook_clone/shared/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,9 +13,15 @@ class EditProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppCubit cubit = AppCubit.get(context);
+    nameController.text = cubit.userDataModel!.name.toString();
+    phoneController.text = cubit.userDataModel!.phone.toString();
+    bioController.text = cubit.userDataModel!.bio.toString();
     return BlocConsumer<AppCubit, AppStates>(
       listener: (BuildContext context, state) {},
       builder: (BuildContext context, Object? state) {
+
+
         return Scaffold(
           appBar: AppBar(
             title: Text('Edit Profile'),
@@ -41,14 +46,16 @@ class EditProfileScreen extends StatelessWidget {
                               topLeft: Radius.circular(20.0),
                             ),
                             image: DecorationImage(
-                              image: NetworkImage(defaultCoverImage),
+                              image: NetworkImage(cubit.coverImage == null
+                                  ? cubit.userDataModel!.coverImage.toString()
+                                  : cubit.coverImage.toString()),
                               fit: BoxFit.cover,
                             ),
                           ),
                         ),
                         Positioned(
-                          height: 400.0,
-                          left: 120.0,
+                          height: MediaQuery.of(context).size.height * 0.51,
+                          left: MediaQuery.of(context).size.width * 0.29,
                           child: CircleAvatar(
                             radius: 70.0,
                             backgroundColor: Colors.white,
@@ -58,7 +65,10 @@ class EditProfileScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(100.0),
                                 image: DecorationImage(
-                                  image: NetworkImage(defaultProfileImage),
+                                  image: NetworkImage(cubit.profileImage == null
+                                      ? cubit.userDataModel!.profileImage
+                                          .toString()
+                                      : cubit.profileImage.toString()),
                                   fit: BoxFit.fill,
                                 ),
                               ),
@@ -69,11 +79,11 @@ class EditProfileScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Mostafa Bastawy',
+                    cubit.userDataModel!.name.toString(),
                     style: Theme.of(context).textTheme.bodyText1,
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                  const Text('Write your Bio...'),
+                  Text(cubit.userDataModel!.bio.toString()),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   TextFormField(
                     controller: nameController,
@@ -123,16 +133,29 @@ class EditProfileScreen extends StatelessWidget {
                       Container(
                         width: MediaQuery.of(context).size.width * .47,
                         child: defaultButton(
-                            function: () {}, text: 'Change Profile'),
+                          function: () {
+                            cubit.getProfileImage();
+                          },
+                          text: 'Change Profile',
+                        ),
                       ),
                       Container(
-                          width: MediaQuery.of(context).size.width * .47,
-                          child: defaultButton(
-                              function: () {}, text: 'Change Cover')),
+                        width: MediaQuery.of(context).size.width * .47,
+                        child: defaultButton(
+                          function: () {
+                            cubit.getCoverImage();
+                          },
+                          text: 'Change Cover',
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                  defaultButton(function: () {}, text: 'Apply Edit'),
+                  defaultButton(
+                    function: () {
+                    },
+                    text: 'Apply Edit',
+                  ),
                 ],
               ),
             ),

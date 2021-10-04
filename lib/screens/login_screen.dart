@@ -17,7 +17,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<AppCubit, AppStates>(
       listener: (BuildContext context, state) {
-        if (state is UserLoginSuccessfulState) {
+        if (state is UserLoginSuccessState) {
           CacheHelper.setData(
               key: 'uid', value: FirebaseAuth.instance.currentUser!.uid);
           navigateAndFinish(context: context, widget: HomeLayout());

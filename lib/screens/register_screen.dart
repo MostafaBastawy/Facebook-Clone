@@ -16,7 +16,7 @@ class RegisterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<AppCubit, AppStates>(
       listener: (BuildContext context, state) {
-        if (state is UserRegisterSuccessfulState) {
+        if (state is UserRegisterSuccessState) {
           navigateAndFinish(context: context, widget: LoginScreen());
         }
       },
