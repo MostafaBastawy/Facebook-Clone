@@ -22,7 +22,7 @@ class EditProfileScreen extends StatelessWidget {
       builder: (BuildContext context, Object? state) {
         return Scaffold(
           appBar: AppBar(
-            title: Text('Edit Profile'),
+            title: const Text('Edit Profile'),
           ),
           body: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
@@ -153,8 +153,14 @@ class EditProfileScreen extends StatelessWidget {
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   defaultButton(
-                    function: () {},
-                    text: 'Apply Edit',
+                    function: () {
+                      cubit.updateUserData(
+                        name: nameController.text,
+                        phone: phoneController.text,
+                        bio: bioController.text,
+                      );
+                    },
+                    text: 'Save Changes',
                   ),
                 ],
               ),

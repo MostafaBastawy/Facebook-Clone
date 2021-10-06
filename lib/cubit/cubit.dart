@@ -119,19 +119,19 @@ class AppCubit extends Cubit<AppStates> {
 
   void updateUserData({
     required String name,
-    required String email,
     required String phone,
     required String bio,
+    String? email,
     String? profileImage,
     String? coverImage,
   }) {
     UserDataModel userModel = UserDataModel(
       name,
+      email = userDataModel!.email,
       phone,
-      email,
+      profileImage = profileImageUrl ?? userDataModel!.profileImage,
+      coverImage = coverImageUrl ?? userDataModel!.coverImage,
       bio,
-      profileImage ?? userDataModel!.profileImage,
-      coverImage ?? userDataModel!.coverImage,
     );
     FirebaseFirestore.instance
         .collection('users')
@@ -139,48 +139,39 @@ class AppCubit extends Cubit<AppStates> {
         .update(userModel.toMap())
         .then((value) {
       getUserData();
+      emit(UpdateUserDataSuccessState());
     }).catchError((error) {
       emit(UpdateUserDataErrorState(error.toString()));
     });
   }
 
   File? profileImage;
+  String? profileImageUrl;
   var picker = ImagePicker();
   Future<void> getProfileImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       profileImage = File(pickedFile.path);
+
       emit(PickProfileImageSuccessState());
+      uploadProfileImage();
     } else {
       emit(PickProfileImageErrorState());
     }
   }
 
-  void uploadProfileImage({
-    required String name,
-    required String email,
-    required String phone,
-    required String bio,
-    String? coverImage,
-    File? profileImage,
-  }) {
+  void uploadProfileImage() {
     if (profileImage != null) {
       firebase_storage.FirebaseStorage.instance
           .ref()
           .child('users')
           .child(FirebaseAuth.instance.currentUser!.uid)
           .child('profileImage.jpg')
-          .putFile(profileImage)
+          .putFile(profileImage!)
           .then((value) {
         value.ref.getDownloadURL().then((value) {
-          updateUserData(
-            name: name,
-            email: email,
-            phone: phone,
-            bio: bio,
-            coverImage: coverImage,
-            profileImage: value,
-          );
+          profileImageUrl = value;
+          print(profileImageUrl);
         }).catchError((error) {
           emit(UploadCoverImageErrorState(error));
         });
@@ -191,24 +182,19 @@ class AppCubit extends Cubit<AppStates> {
   }
 
   File? coverImage;
+  String? coverImageUrl;
   Future<void> getCoverImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       coverImage = File(pickedFile.path);
       emit(PickProfileImageSuccessState());
+      uploadCoverImage();
     } else {
       emit(PickProfileImageErrorState());
     }
   }
 
-  void uploadCoverImage({
-    required String name,
-    required String email,
-    required String phone,
-    required String bio,
-    String? profileImage,
-    File? coverImage,
-  }) {
+  void uploadCoverImage() {
     if (profileImage != null) {
       firebase_storage.FirebaseStorage.instance
           .ref()
@@ -218,14 +204,8 @@ class AppCubit extends Cubit<AppStates> {
           .putFile(coverImage!)
           .then((value) {
         value.ref.getDownloadURL().then((value) {
-          updateUserData(
-            name: name,
-            email: email,
-            phone: phone,
-            bio: bio,
-            coverImage: value,
-            profileImage: profileImage,
-          );
+          coverImageUrl = value;
+          print(coverImageUrl);
         }).catchError((error) {
           emit(UploadCoverImageErrorState(error));
         });

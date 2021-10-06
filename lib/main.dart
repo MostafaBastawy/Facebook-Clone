@@ -8,7 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-void main({BuildContext? context}) async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = MyBlocObserver();
   await CacheHelper.init();
@@ -16,9 +16,6 @@ void main({BuildContext? context}) async {
   String uid = CacheHelper.getData(key: 'uid') ?? '';
   Widget startScreen;
   uid.isNotEmpty ? startScreen = HomeLayout() : startScreen = LoginScreen();
-  if (uid.isNotEmpty) {
-    AppCubit.get(context).getUserData();
-  }
 
   runApp(MyApp(
     startScreen: startScreen,
@@ -33,7 +30,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) => AppCubit(),
+      create: (BuildContext context) => AppCubit()..getUserData(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: lightMode,
