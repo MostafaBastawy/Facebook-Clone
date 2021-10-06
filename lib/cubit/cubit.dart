@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:facebook_clone/cubit/states.dart';
+import 'package:facebook_clone/models/post_model.dart';
 import 'package:facebook_clone/models/user_model.dart';
 import 'package:facebook_clone/screens/chat_screen.dart';
 import 'package:facebook_clone/screens/feeds_screen.dart';
@@ -171,7 +173,6 @@ class AppCubit extends Cubit<AppStates> {
           .then((value) {
         value.ref.getDownloadURL().then((value) {
           profileImageUrl = value;
-          print(profileImageUrl);
         }).catchError((error) {
           emit(UploadCoverImageErrorState(error));
         });
@@ -205,12 +206,78 @@ class AppCubit extends Cubit<AppStates> {
           .then((value) {
         value.ref.getDownloadURL().then((value) {
           coverImageUrl = value;
-          print(coverImageUrl);
         }).catchError((error) {
           emit(UploadCoverImageErrorState(error));
         });
       }).catchError((error) {
         emit(UploadCoverImageErrorState(error));
+      });
+    }
+  }
+
+  PostDataModel? postDataModel;
+  void createPostInDatabase({
+    required String dateTime,
+    required String text,
+    String? postImage,
+    String? name,
+    String? uId,
+    String? image,
+  }) {
+    PostDataModel postDataModel = PostDataModel(
+      name = userDataModel!.name,
+      uId = FirebaseAuth.instance.currentUser!.uid,
+      image = userDataModel!.profileImage,
+      dateTime,
+      text,
+      postImage ?? '',
+    );
+    FirebaseFirestore.instance
+        .collection('posts')
+        .add(postDataModel.toMap())
+        .then((value) {
+      emit(CreatePostSuccessState());
+    }).catchError((error) {
+      emit(CreatePostErrorState(error.toString()));
+    });
+  }
+
+  File? postImage;
+  String? postImageUrl;
+  Future<void> getPostImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      postImage = File(pickedFile.path);
+      uploadPostImage();
+      emit(PickPostImageSuccessState());
+    } else {
+      emit(PickPostImageErrorState());
+    }
+  }
+
+  void removePostImage() {
+    postImageUrl = null;
+    emit(RemovePostImageState());
+  }
+
+  void uploadPostImage() {
+    if (postImage != null) {
+      firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('posts')
+          .child(FirebaseAuth.instance.currentUser!.uid)
+          .child(Uri.file(postImage!.path).pathSegments.last)
+          .putFile(postImage!)
+          .then((value) {
+        value.ref.getDownloadURL().then((value) {
+          postImageUrl = value;
+          Future.delayed(const Duration(seconds: 2));
+          emit(UploadPostImageSuccessState());
+        }).catchError((error) {
+          emit(UploadPostImageErrorState(error));
+        });
+      }).catchError((error) {
+        emit(UploadPostImageErrorState(error));
       });
     }
   }

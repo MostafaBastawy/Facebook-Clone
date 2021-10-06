@@ -1,5 +1,6 @@
 import 'package:facebook_clone/cubit/cubit.dart';
 import 'package:facebook_clone/cubit/states.dart';
+import 'package:facebook_clone/screens/new_post_screen.dart';
 import 'package:facebook_clone/shared/components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,7 +32,9 @@ class FeedsScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 10.0),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        navigateTo(context: context, widget: NewPostScreen());
+                      },
                       child: Text(
                         'Whats on your mind?',
                         style: Theme.of(context).textTheme.bodyText1!,
@@ -67,7 +70,7 @@ class FeedsScreen extends StatelessWidget {
                   return buildPostItem(context);
                 },
                 separatorBuilder: (BuildContext context, int index) {
-                  return  myDivider();
+                  return myDivider();
                 },
                 itemCount: 10,
               ),

@@ -83,3 +83,17 @@ class UpdateUserDataErrorState extends AppStates {
 
   UpdateUserDataErrorState(this.error);
 }
+
+class PickPostImageSuccessState extends AppStates {}
+
+class PickPostImageErrorState extends AppStates {}
+
+class RemovePostImageState extends AppStates {}
+
+class UploadPostImageSuccessState extends AppStates {}
+
+class UploadPostImageErrorState extends AppStates {
+  final String error;
+
+  UploadPostImageErrorState(this.error);
+}
