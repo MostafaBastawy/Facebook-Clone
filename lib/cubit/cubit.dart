@@ -45,6 +45,7 @@ class AppCubit extends Cubit<AppStates> {
         .signInWithEmailAndPassword(email: email, password: password)
         .then((value) {
       getUserData();
+      getPosts();
 
       emit(UserLoginSuccessState());
     }).catchError((error) {
@@ -230,12 +231,14 @@ class AppCubit extends Cubit<AppStates> {
       image = userDataModel!.profileImage,
       dateTime,
       text,
-      postImage ?? '',
+      postImage = postImageUrl ?? '',
     );
     FirebaseFirestore.instance
         .collection('posts')
         .add(postDataModel.toMap())
         .then((value) {
+      getPosts();
+
       emit(CreatePostSuccessState());
     }).catchError((error) {
       emit(CreatePostErrorState(error.toString()));
@@ -280,5 +283,32 @@ class AppCubit extends Cubit<AppStates> {
         emit(UploadPostImageErrorState(error));
       });
     }
+  }
+
+  List<PostDataModel> posts = [];
+  //List<String> postId = [];
+  //List<int> likes = [];
+
+  void getPosts() {
+    posts = [];
+    FirebaseFirestore.instance.collection('posts').get().then((value) {
+      value.docs.forEach((element) {
+        posts.add(PostDataModel.fromJson(element.data()));
+      });
+      emit(GetPostsSuccessState());
+    }).catchError((error) {
+      emit(GetPostsErrorState(error.toString()));
+    });
+  }
+
+  bool refresh = false;
+  void delayRefresh() {
+    getUserData();
+    getPosts();
+    Future.delayed(const Duration(seconds: 10)).then((value) {
+      refresh = true;
+      emit(DelayedRefreshSuccessState());
+    });
+    emit(DelayedRefreshSuccessState());
   }
 }

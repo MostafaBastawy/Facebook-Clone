@@ -2,8 +2,10 @@ import 'package:facebook_clone/cubit/cubit.dart';
 import 'package:facebook_clone/cubit/states.dart';
 import 'package:facebook_clone/screens/home_layout.dart';
 import 'package:facebook_clone/shared/components.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 class NewPostScreen extends StatelessWidget {
   var postController = TextEditingController();
@@ -13,7 +15,12 @@ class NewPostScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     AppCubit cubit = AppCubit.get(context);
     return BlocConsumer<AppCubit, AppStates>(
-      listener: (BuildContext context, state) {},
+      listener: (BuildContext context, state) {
+        if (state is CreatePostSuccessState) {
+          navigateAndFinish(context: context, widget: HomeLayout());
+          cubit.postImageUrl = null;
+        }
+      },
       builder: (BuildContext context, Object? state) {
         return Scaffold(
           appBar: AppBar(
@@ -23,7 +30,7 @@ class NewPostScreen extends StatelessWidget {
                 onPressed: () {
                   if (cubit.postImageUrl != null || postController.text != '') {
                     cubit.createPostInDatabase(
-                        dateTime: DateTime.now().toString(),
+                        dateTime: DateFormat.yMMMd().format(DateTime.now()),
                         text: postController.text);
                   } else {
                     navigateAndFinish(context: context, widget: HomeLayout());

@@ -1,5 +1,7 @@
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:facebook_clone/cubit/cubit.dart';
 import 'package:facebook_clone/cubit/states.dart';
+import 'package:facebook_clone/models/post_model.dart';
 import 'package:facebook_clone/screens/new_post_screen.dart';
 import 'package:facebook_clone/shared/components.dart';
 import 'package:flutter/material.dart';
@@ -11,71 +13,85 @@ class FeedsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppCubit cubit = AppCubit.get(context);
+
     return BlocConsumer<AppCubit, AppStates>(
-      listener: (BuildContext context, state) {},
+      listener: (BuildContext context, state) {
+        if (state is GetPostsSuccessState) {
+          cubit.getUserData();
+        }
+      },
       builder: (BuildContext context, Object? state) {
-        return SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              //This section for creating new posts
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0, vertical: 10.0),
-                child: Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 25.0,
-                      backgroundImage: NetworkImage(
-                          'https://pbs.twimg.com/profile_images/1209274176906752000/5Lne-grQ_400x400.jpg'),
+        return ConditionalBuilder(
+          condition: cubit.posts.isNotEmpty && cubit.userDataModel != null,
+          builder: (BuildContext context) {
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  //This section for creating new posts
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0, vertical: 10.0),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 25.0,
+                          backgroundImage: NetworkImage(
+                              '${cubit.userDataModel!.profileImage}'),
+                        ),
+                        const SizedBox(width: 10.0),
+                        TextButton(
+                          onPressed: () {
+                            navigateTo(
+                                context: context, widget: NewPostScreen());
+                          },
+                          child: Text(
+                            'Whats on your mind?',
+                            style: Theme.of(context).textTheme.bodyText1!,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 10.0),
-                    TextButton(
-                      onPressed: () {
-                        navigateTo(context: context, widget: NewPostScreen());
+                  ),
+                  myDivider(),
+                  //This section for listing new stories
+                  Container(
+                    height: 200.0,
+                    child: ListView.separated(
+                      physics: const BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (BuildContext context, int index) {
+                        return buildStoryItem();
                       },
-                      child: Text(
-                        'Whats on your mind?',
-                        style: Theme.of(context).textTheme.bodyText1!,
-                      ),
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const SizedBox(width: 10.0);
+                      },
+                      itemCount: 10,
                     ),
-                  ],
-                ),
+                  ),
+                  myDivider(),
+                  //This section for listing new posts
+                  ListView.separated(
+                    physics: const BouncingScrollPhysics(),
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (BuildContext context, int index) {
+                      return buildPostItem(context, cubit.posts[index]);
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return myDivider();
+                    },
+                    itemCount: cubit.posts.length,
+                  ),
+                ],
               ),
-              myDivider(),
-              //This section for creating new story
-              Container(
-                height: 200.0,
-                child: ListView.separated(
-                  physics: const BouncingScrollPhysics(),
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (BuildContext context, int index) {
-                    return buildStoryItem();
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return const SizedBox(width: 10.0);
-                  },
-                  itemCount: 10,
-                ),
-              ),
-              myDivider(),
-              //This section for listing new posts
-              ListView.separated(
-                physics: const BouncingScrollPhysics(),
-                shrinkWrap: true,
-                scrollDirection: Axis.vertical,
-                itemBuilder: (BuildContext context, int index) {
-                  return buildPostItem(context);
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return myDivider();
-                },
-                itemCount: 10,
-              ),
-            ],
-          ),
+            );
+          },
+          fallback: (BuildContext context) {
+            return const Center(child: CircularProgressIndicator());
+          },
         );
       },
     );
@@ -225,26 +241,26 @@ class FeedsScreen extends StatelessWidget {
         ),
       );
 
-  Widget buildPostItem(BuildContext context) => Column(
+  Widget buildPostItem(BuildContext context, PostDataModel postDataModel) =>
+      Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Row(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 25.0,
-                  backgroundImage: NetworkImage(
-                      'https://pbs.twimg.com/profile_images/1209274176906752000/5Lne-grQ_400x400.jpg'),
+                  backgroundImage: NetworkImage('${postDataModel.image}'),
                 ),
                 const SizedBox(width: 10.0),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Mostafa Bastawy',
+                      '${postDataModel.name}',
                       style: Theme.of(context).textTheme.bodyText1!,
                     ),
-                    const Text('Post Date'),
+                    Text('${postDataModel.dateTime}'),
                   ],
                 ),
               ],
@@ -253,27 +269,28 @@ class FeedsScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Container(
-              child: const Text(
-                'Wikis are enabled by wiki software, otherwise known as wiki engines. A wiki engine, being a form of a content management system, differs from other web-based systems such as blog software, in that the content is created without any defined owner or leader, and wikis have little inherent structure, allowing structure to emerge according to the needs of the users',
+              child: Text(
+                '${postDataModel.text}',
                 textDirection: TextDirection.ltr,
                 textAlign: TextAlign.start,
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0),
-            child: Container(
-              height: 150.0,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage(
-                      'https://media.istockphoto.com/photos/giza-pyramids-and-sphinx-in-cairo-egypt-picture-id531252132?b=1&k=20&m=531252132&s=170667a&w=0&h=NP-oxcwq4hvIfz2XIU9ArwUm35QXn3ElmVPwqs9vQTg='),
-                  fit: BoxFit.cover,
+          if (postDataModel.postImage == '') const SizedBox(height: 10.0),
+          if (postDataModel.postImage != '')
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10.0),
+              child: Container(
+                height: 150.0,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage('${postDataModel.postImage}'),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
-          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Row(
@@ -309,7 +326,7 @@ class FeedsScreen extends StatelessWidget {
                 Row(
                   children: const [
                     Icon(Icons.chat_bubble_outline),
-                    const SizedBox(width: 8.0),
+                    SizedBox(width: 8.0),
                     Text('Comment'),
                   ],
                 ),

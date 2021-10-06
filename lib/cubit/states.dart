@@ -97,3 +97,13 @@ class UploadPostImageErrorState extends AppStates {
 
   UploadPostImageErrorState(this.error);
 }
+
+class GetPostsSuccessState extends AppStates {}
+
+class GetPostsErrorState extends AppStates {
+  final String error;
+
+  GetPostsErrorState(this.error);
+}
+
+class DelayedRefreshSuccessState extends AppStates {}
