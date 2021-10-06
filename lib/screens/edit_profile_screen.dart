@@ -1,6 +1,6 @@
 import 'package:facebook_clone/cubit/cubit.dart';
 import 'package:facebook_clone/cubit/states.dart';
-import 'package:facebook_clone/screens/home_layout.dart';
+import 'package:facebook_clone/screens/profile_screen.dart';
 import 'package:facebook_clone/shared/components.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +21,7 @@ class EditProfileScreen extends StatelessWidget {
     return BlocConsumer<AppCubit, AppStates>(
       listener: (BuildContext context, state) {
         if (state is UpdateUserDataSuccessState) {
-          navigateAndFinish(context: context, widget: HomeLayout());
+          navigateAndFinish(context: context, widget: ProfileScreen());
         }
       },
       builder: (BuildContext context, Object? state) {
