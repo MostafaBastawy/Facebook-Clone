@@ -30,7 +30,9 @@ class NewPostScreen extends StatelessWidget {
                 onPressed: () {
                   if (cubit.postImageUrl != null || postController.text != '') {
                     cubit.createPostInDatabase(
-                        dateTime: DateFormat.yMMMd().format(DateTime.now()),
+                        dateTime: DateFormat.yMMMMd()
+                            .add_Hms()
+                            .format(DateTime.now()),
                         text: postController.text);
                   } else {
                     navigateAndFinish(context: context, widget: HomeLayout());

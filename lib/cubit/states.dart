@@ -107,3 +107,21 @@ class GetPostsErrorState extends AppStates {
 }
 
 class DelayedRefreshSuccessState extends AppStates {}
+
+class GetUsersSuccessState extends AppStates {}
+
+class GetUsersErrorState extends AppStates {
+  final String error;
+
+  GetUsersErrorState(this.error);
+}
+
+class GetMessagesSuccessState extends AppStates {}
+
+class SendMessagesSuccessState extends AppStates {}
+
+class SendMessagesErrorState extends AppStates {
+  final String error;
+
+  SendMessagesErrorState(this.error);
+}

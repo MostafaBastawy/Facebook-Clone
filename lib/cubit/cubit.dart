@@ -4,10 +4,11 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:facebook_clone/cubit/states.dart';
+import 'package:facebook_clone/models/message_model.dart';
 import 'package:facebook_clone/models/post_model.dart';
 import 'package:facebook_clone/models/user_model.dart';
-import 'package:facebook_clone/screens/chat_screen.dart';
 import 'package:facebook_clone/screens/feeds_screen.dart';
+import 'package:facebook_clone/screens/messenger_screen.dart';
 import 'package:facebook_clone/screens/profile_screen.dart';
 import 'package:facebook_clone/shared/constants.dart';
 import 'package:facebook_clone/shared/shared_prefrence.dart';
@@ -23,17 +24,18 @@ class AppCubit extends Cubit<AppStates> {
 
   List<String> titles = [
     'Facebook',
-    'Chat',
+    'Messenger',
     'Profile',
   ];
   List<Widget> screens = [
     const FeedsScreen(),
-    const ChatScreen(),
+    const MessengerScreen(),
     ProfileScreen(),
   ];
   int currentIndex = 0;
   void changeBottomNavBar(int index) {
     currentIndex = index;
+    getUsers();
     emit(ChangeBottomNavBarState());
   }
 
@@ -85,6 +87,7 @@ class AppCubit extends Cubit<AppStates> {
       defaultProfileImage,
       defaultCoverImage,
       defaultBio,
+      FirebaseAuth.instance.currentUser!.uid,
     );
     FirebaseFirestore.instance
         .collection('users')
@@ -127,6 +130,7 @@ class AppCubit extends Cubit<AppStates> {
     String? email,
     String? profileImage,
     String? coverImage,
+    String? uid,
   }) {
     UserDataModel userModel = UserDataModel(
       name,
@@ -135,6 +139,7 @@ class AppCubit extends Cubit<AppStates> {
       profileImage = profileImageUrl ?? userDataModel!.profileImage,
       coverImage = coverImageUrl ?? userDataModel!.coverImage,
       bio,
+      uid = FirebaseAuth.instance.currentUser!.uid,
     );
     FirebaseFirestore.instance
         .collection('users')
@@ -301,14 +306,75 @@ class AppCubit extends Cubit<AppStates> {
     });
   }
 
-  bool refresh = false;
-  void delayRefresh() {
-    getUserData();
-    getPosts();
-    Future.delayed(const Duration(seconds: 10)).then((value) {
-      refresh = true;
-      emit(DelayedRefreshSuccessState());
+  List<UserDataModel> users = [];
+  void getUsers() {
+    users = [];
+    FirebaseFirestore.instance.collection('users').get().then((value) {
+      value.docs.forEach((element) {
+        if (element.data()['uid'] != FirebaseAuth.instance.currentUser!.uid)
+          users.add(UserDataModel.fromJson(element.data()));
+      });
+      emit(GetUsersSuccessState());
+    }).catchError((error) {
+      emit(GetUsersErrorState(error.toString()));
     });
-    emit(DelayedRefreshSuccessState());
+  }
+
+  void sendMessage({
+    required String receiverId,
+    required String dateTime,
+    required String text,
+  }) {
+    MessageDataModel messageDataModel = MessageDataModel(
+      FirebaseAuth.instance.currentUser!.uid,
+      receiverId,
+      dateTime,
+      text,
+    );
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('chats')
+        .doc(receiverId)
+        .collection('messages')
+        .add(messageDataModel.toMap())
+        .then((value) {
+      emit(SendMessagesSuccessState());
+    }).catchError((error) {
+      emit(SendMessagesErrorState(error.toString()));
+    });
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(receiverId)
+        .collection('chats')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('messages')
+        .add(messageDataModel.toMap())
+        .then((value) {
+      emit(SendMessagesSuccessState());
+    }).catchError((error) {
+      emit(SendMessagesErrorState(error.toString()));
+    });
+  }
+
+  List<MessageDataModel> messages = [];
+  void getMessages({
+    required String receiverId,
+  }) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('chats')
+        .doc(receiverId)
+        .collection('messages')
+        .orderBy('dateTime')
+        .snapshots()
+        .listen((event) {
+      messages = [];
+      event.docs.forEach((element) {
+        messages.add(MessageDataModel.fromJson(element.data()));
+      });
+      emit(GetMessagesSuccessState());
+    });
   }
 }

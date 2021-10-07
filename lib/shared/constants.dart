@@ -25,8 +25,7 @@ ThemeData lightMode = ThemeData(
 );
 
 ThemeData darkMode = ThemeData();
-String defaultProfileImage =
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNTmC3sqQmpaxRzTIz009mFt_AMzGYTs_w_VBVHyXPIOAmEP995kITocRkxX_Lm6V8ug0&usqp=CAU';
+String defaultProfileImage = 'https://i.stack.imgur.com/l60Hf.png';
 String defaultCoverImage =
-    'https://socialsizes.io/static/facebook-cover-photo-size-eb6495646be79eea62423b216ac0b36b.jpg';
+    'http://vapeairways.com/wp-content/uploads/2016/04/dummy-post-horisontal-thegem-blog-default.jpg';
 String defaultBio = 'Write your Bio...';
