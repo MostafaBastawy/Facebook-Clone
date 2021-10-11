@@ -20,7 +20,7 @@ class MessengerScreen extends StatelessWidget {
             return buildChatItem(context, cubit.users[index]);
           },
           separatorBuilder: (BuildContext context, int index) {
-            return SizedBox(height: 5.0);
+            return const SizedBox(height: 5.0);
           },
           itemCount: cubit.users.length,
         );

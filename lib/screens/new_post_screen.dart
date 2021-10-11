@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:facebook_clone/cubit/cubit.dart';
 import 'package:facebook_clone/cubit/states.dart';
 import 'package:facebook_clone/screens/home_layout.dart';
@@ -30,6 +31,7 @@ class NewPostScreen extends StatelessWidget {
                 onPressed: () {
                   if (cubit.postImageUrl != null || postController.text != '') {
                     cubit.createPostInDatabase(
+                        createAt: Timestamp.fromDate(DateTime.now()).toString(),
                         dateTime: DateFormat.yMMMMd()
                             .add_Hms()
                             .format(DateTime.now()),

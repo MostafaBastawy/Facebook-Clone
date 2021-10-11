@@ -55,7 +55,7 @@ class ChatScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: ListView.separated(
-                        physics: BouncingScrollPhysics(),
+                        physics: const BouncingScrollPhysics(),
                         itemBuilder: (BuildContext context, int index) {
                           if (FirebaseAuth.instance.currentUser!.uid ==
                               cubit.messages[index].senderId) {
@@ -92,13 +92,16 @@ class ChatScreen extends StatelessWidget {
                             ),
                             MaterialButton(
                               onPressed: () {
-                                cubit.sendMessage(
-                                  receiverId: userDataModel!.uid!,
-                                  dateTime: DateFormat.yMMMMd()
-                                      .add_Hms()
-                                      .format(DateTime.now()),
-                                  text: messageController.text,
-                                );
+                                if (messageController.text.isNotEmpty) {
+                                  cubit.sendMessage(
+                                    receiverId: userDataModel!.uid!,
+                                    dateTime: DateFormat.yMMMMd()
+                                        .add_Hms()
+                                        .format(DateTime.now()),
+                                    text: messageController.text,
+                                  );
+                                }
+
                                 messageController.text = '';
                               },
                               child: const Icon(

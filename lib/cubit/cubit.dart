@@ -222,14 +222,14 @@ class AppCubit extends Cubit<AppStates> {
   }
 
   PostDataModel? postDataModel;
-  void createPostInDatabase({
-    required String dateTime,
-    required String text,
-    String? postImage,
-    String? name,
-    String? uId,
-    String? image,
-  }) {
+  void createPostInDatabase(
+      {required String dateTime,
+      required String text,
+      String? postImage,
+      String? name,
+      String? uId,
+      String? image,
+      String? createAt}) {
     PostDataModel postDataModel = PostDataModel(
       name = userDataModel!.name,
       uId = FirebaseAuth.instance.currentUser!.uid,
@@ -237,6 +237,7 @@ class AppCubit extends Cubit<AppStates> {
       dateTime,
       text,
       postImage = postImageUrl ?? '',
+      createAt,
     );
     FirebaseFirestore.instance
         .collection('posts')
@@ -291,12 +292,14 @@ class AppCubit extends Cubit<AppStates> {
   }
 
   List<PostDataModel> posts = [];
-  //List<String> postId = [];
-  //List<int> likes = [];
 
   void getPosts() {
     posts = [];
-    FirebaseFirestore.instance.collection('posts').get().then((value) {
+    FirebaseFirestore.instance
+        .collection('posts')
+        .orderBy('createAt', descending: true)
+        .get()
+        .then((value) {
       value.docs.forEach((element) {
         posts.add(PostDataModel.fromJson(element.data()));
       });
@@ -311,8 +314,9 @@ class AppCubit extends Cubit<AppStates> {
     users = [];
     FirebaseFirestore.instance.collection('users').get().then((value) {
       value.docs.forEach((element) {
-        if (element.data()['uid'] != FirebaseAuth.instance.currentUser!.uid)
+        if (element.data()['uid'] != FirebaseAuth.instance.currentUser!.uid) {
           users.add(UserDataModel.fromJson(element.data()));
+        }
       });
       emit(GetUsersSuccessState());
     }).catchError((error) {

@@ -5,6 +5,7 @@ class PostDataModel {
   String? dateTime;
   String? text;
   String? postImage;
+  String? createAt;
 
   PostDataModel(
     this.name,
@@ -13,6 +14,7 @@ class PostDataModel {
     this.dateTime,
     this.text,
     this.postImage,
+    this.createAt,
   );
 
   PostDataModel.fromJson(Map<String, dynamic> json) {
@@ -22,6 +24,7 @@ class PostDataModel {
     dateTime = json['dateTime'];
     text = json['text'];
     postImage = json['postImage'];
+    createAt = json['createAt'];
   }
 
   Map<String, dynamic> toMap() {
@@ -32,6 +35,7 @@ class PostDataModel {
       'dateTime': dateTime,
       'text': text,
       'postImage': postImage,
+      'createAt': createAt,
     };
   }
 }
