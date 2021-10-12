@@ -32,7 +32,8 @@ class MyApp extends StatelessWidget {
     return BlocProvider(
       create: (BuildContext context) => AppCubit()
         ..getUsers()
-        ..getPosts(),
+        ..getPosts()
+        ..getStories(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: lightMode,

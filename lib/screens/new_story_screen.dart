@@ -8,40 +8,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-class NewPostScreen extends StatelessWidget {
-  var postController = TextEditingController();
-  NewPostScreen({Key? key}) : super(key: key);
+class NewStoryScreen extends StatelessWidget {
+  NewStoryScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     AppCubit cubit = AppCubit.get(context);
     return BlocConsumer<AppCubit, AppStates>(
       listener: (BuildContext context, state) {
-        if (state is CreatePostSuccessState) {
+        if (state is CreateStorySuccessState) {
           navigateAndFinish(context: context, widget: HomeLayout());
-          cubit.postImageUrl = null;
+          cubit.storyImageUrl = null;
         }
       },
       builder: (BuildContext context, Object? state) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Create Post'),
+            title: const Text('Create Story'),
             actions: [
               TextButton(
                 onPressed: () {
-                  if (cubit.postImageUrl != null || postController.text != '') {
-                    cubit.createPostInDatabase(
+                  if (cubit.storyImageUrl != null) {
+                    cubit.createStoryInDatabase(
                       createAt: Timestamp.fromDate(DateTime.now()).toString(),
                       dateTime:
                           DateFormat.yMMMMd().add_Hms().format(DateTime.now()),
-                      text: postController.text,
                     );
                   } else {
                     navigateAndFinish(context: context, widget: HomeLayout());
                   }
                 },
                 child: const Text(
-                  'POST',
+                  'Create',
                   style: TextStyle(fontSize: 18.0),
                 ),
               ),
@@ -52,6 +50,7 @@ class NewPostScreen extends StatelessWidget {
             padding:
                 const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
@@ -67,32 +66,18 @@ class NewPostScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        maxLines: 5,
-                        controller: postController,
-                        decoration: const InputDecoration(
-                          hintText: 'what\'s on your mind?',
-                          border: InputBorder.none,
-                        ),
+                if (cubit.storyImageUrl != null)
+                  Container(
+                    height: 300.0,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      image: DecorationImage(
+                        image: NetworkImage('${cubit.storyImageUrl}'),
+                        fit: BoxFit.fill,
                       ),
-                      if (cubit.postImageUrl != null)
-                        Container(
-                          height: 150.0,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0),
-                            image: DecorationImage(
-                              image: NetworkImage('${cubit.postImageUrl}'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                    ],
+                    ),
                   ),
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -100,7 +85,7 @@ class NewPostScreen extends StatelessWidget {
                       width: MediaQuery.of(context).size.width * .39,
                       child: defaultButton(
                         function: () {
-                          cubit.getPostImage();
+                          cubit.getStoryImage();
                         },
                         text: 'Add Photo',
                       ),
@@ -109,7 +94,7 @@ class NewPostScreen extends StatelessWidget {
                       width: MediaQuery.of(context).size.width * .39,
                       child: defaultButton(
                         function: () {
-                          cubit.removePostImage();
+                          cubit.removeStoryImage();
                         },
                         text: 'Remove Photo',
                       ),

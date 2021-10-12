@@ -125,3 +125,33 @@ class SendMessagesErrorState extends AppStates {
 
   SendMessagesErrorState(this.error);
 }
+
+class CreateStorySuccessState extends AppStates {}
+
+class CreateStoryErrorState extends AppStates {
+  final String error;
+
+  CreateStoryErrorState(this.error);
+}
+
+class PickStoryImageSuccessState extends AppStates {}
+
+class PickStoryImageErrorState extends AppStates {}
+
+class RemoveStoryImageState extends AppStates {}
+
+class UploadStoryImageSuccessState extends AppStates {}
+
+class UploadStoryImageErrorState extends AppStates {
+  final String error;
+
+  UploadStoryImageErrorState(this.error);
+}
+
+class GetStoriesSuccessState extends AppStates {}
+
+class GetStoriesErrorState extends AppStates {
+  final String error;
+
+  GetStoriesErrorState(this.error);
+}

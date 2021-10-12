@@ -2,7 +2,9 @@ import 'package:conditional_builder_null_safety/conditional_builder_null_safety.
 import 'package:facebook_clone/cubit/cubit.dart';
 import 'package:facebook_clone/cubit/states.dart';
 import 'package:facebook_clone/models/post_model.dart';
+import 'package:facebook_clone/models/stroy_model.dart';
 import 'package:facebook_clone/screens/new_post_screen.dart';
+import 'package:facebook_clone/screens/new_story_screen.dart';
 import 'package:facebook_clone/shared/components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -57,18 +59,28 @@ class FeedsScreen extends StatelessWidget {
                   myDivider(),
                   //This section for listing new stories
                   Container(
-                    height: 200.0,
-                    child: ListView.separated(
+                    height: 202.0,
+                    child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
-                      shrinkWrap: true,
                       scrollDirection: Axis.horizontal,
-                      itemBuilder: (BuildContext context, int index) {
-                        return buildStoryItem();
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return const SizedBox(width: 10.0);
-                      },
-                      itemCount: 10,
+                      child: Row(
+                        children: [
+                          buildMyStoryItem(context),
+                          const SizedBox(width: 10.0),
+                          ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            itemBuilder: (BuildContext context, int index) {
+                              return buildStoryItem(cubit.stories[index]);
+                            },
+                            separatorBuilder:
+                                (BuildContext context, int index) {
+                              return const SizedBox(width: 10.0);
+                            },
+                            itemCount: cubit.stories.length,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   myDivider(),
@@ -118,14 +130,14 @@ class FeedsScreen extends StatelessWidget {
                 children: [
                   Container(
                     height: 110.0,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
                         topRight: Radius.circular(20.0),
                         topLeft: Radius.circular(20.0),
                       ),
                       image: DecorationImage(
                         image: NetworkImage(
-                            'https://pbs.twimg.com/profile_images/1209274176906752000/5Lne-grQ_400x400.jpg'),
+                            '${AppCubit.get(context).userDataModel!.profileImage}'),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -160,10 +172,16 @@ class FeedsScreen extends StatelessWidget {
                         color: Colors.blue[800],
                         borderRadius: BorderRadius.circular(100.0),
                       ),
-                      child: const Icon(
-                        Icons.add,
-                        size: 30.0,
-                        color: Colors.white,
+                      child: InkWell(
+                        onTap: () {
+                          navigateTo(
+                              context: context, widget: NewStoryScreen());
+                        },
+                        child: const Icon(
+                          Icons.add,
+                          size: 30.0,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -174,7 +192,7 @@ class FeedsScreen extends StatelessWidget {
         ),
       );
 
-  Widget buildStoryItem() => Padding(
+  Widget buildStoryItem(StoryDataModel storyDataModel) => Padding(
         padding: const EdgeInsets.only(bottom: 10.0, top: 10.0),
         child: Stack(
           children: [
@@ -187,9 +205,8 @@ class FeedsScreen extends StatelessWidget {
                 border: Border.all(
                   color: Colors.grey.withOpacity(0.7),
                 ),
-                image: const DecorationImage(
-                  image: NetworkImage(
-                      'https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500'),
+                image: DecorationImage(
+                  image: NetworkImage('${storyDataModel.storyImage}'),
                   fit: BoxFit.fill,
                 ),
               ),
@@ -212,9 +229,9 @@ class FeedsScreen extends StatelessWidget {
                       color: Colors.grey[100],
                       borderRadius: BorderRadius.circular(100.0),
                     ),
-                    child: const Image(
-                      image: NetworkImage(
-                          'https://cdn.pixabay.com/photo/2014/04/03/10/50/egyptian-311457_960_720.png'),
+                    child: CircleAvatar(
+                      radius: 25.0,
+                      backgroundImage: NetworkImage('${storyDataModel.image}'),
                     ),
                   ),
                 ),
@@ -226,11 +243,11 @@ class FeedsScreen extends StatelessWidget {
               child: Container(
                 width: 80.0,
                 height: 30.0,
-                child: const Text(
-                  'Cameroon Jho',
+                child: Text(
+                  '${storyDataModel.name}',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),

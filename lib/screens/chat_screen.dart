@@ -138,6 +138,7 @@ class ChatScreen extends StatelessWidget {
           child: Text('${messageDataModel.text}'),
         ),
       );
+
   Widget buildSenderMessage(MessageDataModel messageDataModel) => Align(
         alignment: AlignmentDirectional.centerEnd,
         child: Container(

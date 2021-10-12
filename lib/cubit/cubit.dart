@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:facebook_clone/cubit/states.dart';
 import 'package:facebook_clone/models/message_model.dart';
 import 'package:facebook_clone/models/post_model.dart';
+import 'package:facebook_clone/models/stroy_model.dart';
 import 'package:facebook_clone/models/user_model.dart';
 import 'package:facebook_clone/screens/feeds_screen.dart';
 import 'package:facebook_clone/screens/messenger_screen.dart';
@@ -280,7 +281,6 @@ class AppCubit extends Cubit<AppStates> {
           .then((value) {
         value.ref.getDownloadURL().then((value) {
           postImageUrl = value;
-          Future.delayed(const Duration(seconds: 2));
           emit(UploadPostImageSuccessState());
         }).catchError((error) {
           emit(UploadPostImageErrorState(error));
@@ -379,6 +379,90 @@ class AppCubit extends Cubit<AppStates> {
         messages.add(MessageDataModel.fromJson(element.data()));
       });
       emit(GetMessagesSuccessState());
+    });
+  }
+
+  File? storyImage;
+  String? storyImageUrl;
+  Future<void> getStoryImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      storyImage = File(pickedFile.path);
+      uploadStoryImage();
+      emit(PickStoryImageSuccessState());
+    } else {
+      emit(PickStoryImageErrorState());
+    }
+  }
+
+  void removeStoryImage() {
+    postImageUrl = null;
+    emit(RemoveStoryImageState());
+  }
+
+  void uploadStoryImage() {
+    if (storyImage != null) {
+      firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('users')
+          .child(FirebaseAuth.instance.currentUser!.uid)
+          .child('storyImage.jpg')
+          .putFile(storyImage!)
+          .then((value) {
+        value.ref.getDownloadURL().then((value) {
+          storyImageUrl = value;
+          emit(UploadPostImageSuccessState());
+        }).catchError((error) {
+          emit(UploadStoryImageErrorState(error));
+        });
+      }).catchError((error) {
+        emit(UploadStoryImageErrorState(error));
+      });
+    }
+  }
+
+  StoryDataModel? storyDataModel;
+  void createStoryInDatabase(
+      {required String dateTime,
+      String? storyImage,
+      String? name,
+      String? uId,
+      String? image,
+      String? createAt}) {
+    StoryDataModel storyDataModel = StoryDataModel(
+      name = userDataModel!.name,
+      uId = FirebaseAuth.instance.currentUser!.uid,
+      image = userDataModel!.profileImage,
+      dateTime,
+      storyImage = storyImageUrl ?? '',
+      createAt,
+    );
+    FirebaseFirestore.instance
+        .collection('stories').doc(FirebaseAuth.instance.currentUser!.uid)
+        .set(storyDataModel.toMap())
+        .then((value) {
+      getStories();
+
+      emit(CreateStorySuccessState());
+    }).catchError((error) {
+      emit(CreateStoryErrorState(error.toString()));
+    });
+  }
+
+  List<StoryDataModel> stories = [];
+  void getStories() {
+    stories = [];
+    FirebaseFirestore.instance
+        .collection('stories')
+        .orderBy('createAt', descending: true)
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        stories.add(StoryDataModel.fromJson(element.data()));
+      });
+      emit(GetStoriesSuccessState());
+    }).catchError((error) {
+      emit(GetStoriesErrorState(error.toString()));
     });
   }
 }
