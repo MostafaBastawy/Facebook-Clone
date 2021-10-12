@@ -335,7 +335,7 @@ class FeedsScreen extends StatelessWidget {
                 Row(
                   children: const [
                     Icon(Icons.favorite_border),
-                    const SizedBox(width: 8.0),
+                    SizedBox(width: 8.0),
                     Text('Like'),
                   ],
                 ),

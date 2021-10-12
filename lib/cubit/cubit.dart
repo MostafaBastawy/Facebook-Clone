@@ -203,7 +203,7 @@ class AppCubit extends Cubit<AppStates> {
   }
 
   void uploadCoverImage() {
-    if (profileImage != null) {
+    if (coverImage != null) {
       firebase_storage.FirebaseStorage.instance
           .ref()
           .child('users')
@@ -438,7 +438,8 @@ class AppCubit extends Cubit<AppStates> {
       createAt,
     );
     FirebaseFirestore.instance
-        .collection('stories').doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('stories')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
         .set(storyDataModel.toMap())
         .then((value) {
       getStories();
