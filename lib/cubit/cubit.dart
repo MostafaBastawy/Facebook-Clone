@@ -529,7 +529,7 @@ class AppCubit extends Cubit<AppStates> {
         .add(commentDataModel.toMap())
         .then((value) {
       getComments();
-      emit(CreateCommentInDatabaseSuccessState());
+      //emit(CreateCommentInDatabaseSuccessState());
     }).catchError((error) {
       emit(CreateCommentInDatabaseErrorState(error));
     });

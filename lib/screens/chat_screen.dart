@@ -83,6 +83,8 @@ class ChatScreen extends StatelessWidget {
                           children: [
                             Expanded(
                               child: TextFormField(
+                                maxLines: null,
+                                keyboardType: TextInputType.multiline,
                                 controller: messageController,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,

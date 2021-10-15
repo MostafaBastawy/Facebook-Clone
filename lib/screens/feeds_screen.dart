@@ -323,7 +323,7 @@ class FeedsScreen extends StatelessWidget {
                         widget: CommentScreen(
                             AppCubit.get(context).postsId[index]));
                   },
-                  child: const Text('Comments'),
+                  child: const Text('0 Comments'),
                 ),
               ],
             ),

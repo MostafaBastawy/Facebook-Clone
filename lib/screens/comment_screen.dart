@@ -57,6 +57,8 @@ class CommentScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: TextFormField(
+                              maxLines: null,
+                              keyboardType: TextInputType.multiline,
                               controller: commentController,
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
