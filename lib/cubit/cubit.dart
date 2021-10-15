@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:facebook_clone/cubit/states.dart';
+import 'package:facebook_clone/models/comment_model.dart';
 import 'package:facebook_clone/models/message_model.dart';
 import 'package:facebook_clone/models/post_model.dart';
 import 'package:facebook_clone/models/stroy_model.dart';
@@ -21,6 +22,7 @@ import 'package:image_picker/image_picker.dart';
 
 class AppCubit extends Cubit<AppStates> {
   AppCubit() : super(InitialState());
+
   static AppCubit get(context) => BlocProvider.of(context);
 
   List<String> titles = [
@@ -34,6 +36,7 @@ class AppCubit extends Cubit<AppStates> {
     ProfileScreen(),
   ];
   int currentIndex = 0;
+
   void changeBottomNavBar(int index) {
     currentIndex = index;
     getUsers();
@@ -111,6 +114,7 @@ class AppCubit extends Cubit<AppStates> {
   }
 
   UserDataModel? userDataModel;
+
   void getUserData() {
     FirebaseFirestore.instance
         .collection('users')
@@ -157,6 +161,7 @@ class AppCubit extends Cubit<AppStates> {
   File? profileImage;
   String? profileImageUrl;
   var picker = ImagePicker();
+
   Future<void> getProfileImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -191,6 +196,7 @@ class AppCubit extends Cubit<AppStates> {
 
   File? coverImage;
   String? coverImageUrl;
+
   Future<void> getCoverImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -222,15 +228,19 @@ class AppCubit extends Cubit<AppStates> {
     }
   }
 
+  PostDataModel? model;
   PostDataModel? postDataModel;
-  void createPostInDatabase(
-      {required String dateTime,
-      required String text,
-      String? postImage,
-      String? name,
-      String? uId,
-      String? image,
-      String? createAt}) {
+
+  void createPostInDatabase({
+    required String dateTime,
+    required String text,
+    String? postImage,
+    String? name,
+    String? uId,
+    String? image,
+    String? createAt,
+    String? postUid,
+  }) {
     PostDataModel postDataModel = PostDataModel(
       name = userDataModel!.name,
       uId = FirebaseAuth.instance.currentUser!.uid,
@@ -254,6 +264,7 @@ class AppCubit extends Cubit<AppStates> {
 
   File? postImage;
   String? postImageUrl;
+
   Future<void> getPostImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -292,15 +303,18 @@ class AppCubit extends Cubit<AppStates> {
   }
 
   List<PostDataModel> posts = [];
+  List<String> postsId = [];
 
   void getPosts() {
     posts = [];
+
     FirebaseFirestore.instance
         .collection('posts')
         .orderBy('createAt', descending: true)
         .get()
         .then((value) {
       value.docs.forEach((element) {
+        postsId.add(element.id);
         posts.add(PostDataModel.fromJson(element.data()));
       });
       emit(GetPostsSuccessState());
@@ -310,6 +324,7 @@ class AppCubit extends Cubit<AppStates> {
   }
 
   List<UserDataModel> users = [];
+
   void getUsers() {
     users = [];
     FirebaseFirestore.instance.collection('users').get().then((value) {
@@ -362,6 +377,7 @@ class AppCubit extends Cubit<AppStates> {
   }
 
   List<MessageDataModel> messages = [];
+
   void getMessages({
     required String receiverId,
   }) {
@@ -384,6 +400,7 @@ class AppCubit extends Cubit<AppStates> {
 
   File? storyImage;
   String? storyImageUrl;
+
   Future<void> getStoryImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -422,6 +439,7 @@ class AppCubit extends Cubit<AppStates> {
   }
 
   StoryDataModel? storyDataModel;
+
   void createStoryInDatabase(
       {required String dateTime,
       String? storyImage,
@@ -451,6 +469,7 @@ class AppCubit extends Cubit<AppStates> {
   }
 
   List<StoryDataModel> stories = [];
+
   void getStories() {
     stories = [];
     FirebaseFirestore.instance
@@ -464,6 +483,75 @@ class AppCubit extends Cubit<AppStates> {
       emit(GetStoriesSuccessState());
     }).catchError((error) {
       emit(GetStoriesErrorState(error.toString()));
+    });
+  }
+
+  void likePost({required String postId}) {
+    FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .collection('likes')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .set({
+      'like': true,
+    }).then((value) {
+      emit(LikePostSuccessState());
+    }).catchError((error) {
+      emit(LikePostErrorState(error.toString()));
+    });
+  }
+
+  CommentDataModel? commentDataModel;
+  List<CommentDataModel> comments = [];
+
+  void createCommentInDatabase({
+    required String postUid,
+    required String dateTime,
+    required String createAt,
+    required String commentText,
+    String? userProfileImageUrl,
+    String? userName,
+    String? userUid,
+  }) {
+    CommentDataModel commentDataModel = CommentDataModel(
+      postUid,
+      dateTime,
+      createAt,
+      commentText,
+      userProfileImageUrl = userDataModel!.profileImage.toString(),
+      userName = userDataModel!.name.toString(),
+      userUid = FirebaseAuth.instance.currentUser!.uid,
+    );
+    FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postUid)
+        .collection('comments')
+        .add(commentDataModel.toMap())
+        .then((value) {
+      getComments();
+      emit(CreateCommentInDatabaseSuccessState());
+    }).catchError((error) {
+      emit(CreateCommentInDatabaseErrorState(error));
+    });
+  }
+
+  void getComments({
+    String? postUid,
+  }) {
+    comments = [];
+
+    FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postUid)
+        .collection('comments')
+        .orderBy('createAt')
+        .snapshots()
+        .listen((event) {
+      comments = [];
+      event.docs.forEach((element) {
+        comments.add(CommentDataModel.fromJson(element.data()));
+        emit(GetCommentsSuccessState());
+      });
     });
   }
 }

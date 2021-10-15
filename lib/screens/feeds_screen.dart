@@ -3,6 +3,7 @@ import 'package:facebook_clone/cubit/cubit.dart';
 import 'package:facebook_clone/cubit/states.dart';
 import 'package:facebook_clone/models/post_model.dart';
 import 'package:facebook_clone/models/stroy_model.dart';
+import 'package:facebook_clone/screens/comment_screen.dart';
 import 'package:facebook_clone/screens/new_post_screen.dart';
 import 'package:facebook_clone/screens/new_story_screen.dart';
 import 'package:facebook_clone/shared/components.dart';
@@ -90,7 +91,7 @@ class FeedsScreen extends StatelessWidget {
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
                     itemBuilder: (BuildContext context, int index) {
-                      return buildPostItem(context, cubit.posts[index]);
+                      return buildPostItem(context, cubit.posts[index], index);
                     },
                     separatorBuilder: (BuildContext context, int index) {
                       return myDivider();
@@ -258,7 +259,8 @@ class FeedsScreen extends StatelessWidget {
         ),
       );
 
-  Widget buildPostItem(BuildContext context, PostDataModel postDataModel) =>
+  Widget buildPostItem(
+          BuildContext context, PostDataModel postDataModel, int index) =>
       Column(
         children: [
           Padding(
@@ -311,10 +313,18 @@ class FeedsScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Row(
-              children: const [
-                Text('120 Likes'),
-                Spacer(),
-                Text('120 Comments'),
+              children: [
+                const Text('0 Likes'),
+                const Spacer(),
+                InkWell(
+                  onTap: () {
+                    navigateTo(
+                        context: context,
+                        widget: CommentScreen(
+                            AppCubit.get(context).postsId[index]));
+                  },
+                  child: const Text('Comments'),
+                ),
               ],
             ),
           ),
@@ -340,12 +350,21 @@ class FeedsScreen extends StatelessWidget {
                   ],
                 ),
                 const Spacer(),
-                Row(
-                  children: const [
-                    Icon(Icons.chat_bubble_outline),
-                    SizedBox(width: 8.0),
-                    Text('Comment'),
-                  ],
+                InkWell(
+                  onTap: () {
+                    navigateTo(
+                      context: context,
+                      widget:
+                          CommentScreen(AppCubit.get(context).postsId[index]),
+                    );
+                  },
+                  child: Row(
+                    children: const [
+                      Icon(Icons.chat_bubble_outline),
+                      SizedBox(width: 8.0),
+                      Text('Comment'),
+                    ],
+                  ),
                 ),
               ],
             ),

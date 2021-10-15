@@ -155,3 +155,35 @@ class GetStoriesErrorState extends AppStates {
 
   GetStoriesErrorState(this.error);
 }
+
+class LikePostSuccessState extends AppStates {}
+
+class LikePostErrorState extends AppStates {
+  final String error;
+
+  LikePostErrorState(this.error);
+}
+
+class GetLikesSuccessState extends AppStates {}
+
+class GetLikesErrorState extends AppStates {
+  final String error;
+
+  GetLikesErrorState(this.error);
+}
+
+class CreateCommentInDatabaseSuccessState extends AppStates {}
+
+class CreateCommentInDatabaseErrorState extends AppStates {
+  final String error;
+
+  CreateCommentInDatabaseErrorState(this.error);
+}
+
+class GetCommentsSuccessState extends AppStates {}
+
+class GetCommentsErrorState extends AppStates {
+  final String error;
+
+  GetCommentsErrorState(this.error);
+}
