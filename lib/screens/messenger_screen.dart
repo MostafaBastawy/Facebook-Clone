@@ -58,6 +58,8 @@ class MessengerScreen extends StatelessWidget {
                   ),
                 ],
               ),
+              const Spacer(),
+              const Icon(Icons.arrow_forward_ios_outlined),
             ],
           ),
         ),

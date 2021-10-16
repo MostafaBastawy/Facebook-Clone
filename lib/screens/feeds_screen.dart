@@ -17,103 +17,100 @@ class FeedsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     AppCubit cubit = AppCubit.get(context);
 
-    return Builder(builder: (context) {
-      cubit.getPosts();
-      return BlocConsumer<AppCubit, AppStates>(
-        listener: (BuildContext context, state) {
-          if (state is GetPostsSuccessState) {
-            cubit.getUserData();
-          }
-        },
-        builder: (BuildContext context, Object? state) {
-          return ConditionalBuilder(
-            condition: cubit.posts.isNotEmpty &&
-                cubit.userDataModel != null &&
-                cubit.commentsNumber.isNotEmpty,
-            builder: (BuildContext context) {
-              return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    //This section for creating new posts
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 10.0),
+    return BlocConsumer<AppCubit, AppStates>(
+      listener: (BuildContext context, state) {
+        if (state is GetPostsSuccessState) {
+          cubit.getUserData();
+        }
+      },
+      builder: (BuildContext context, Object? state) {
+        return ConditionalBuilder(
+          condition: cubit.posts.isNotEmpty &&
+              cubit.userDataModel != null &&
+              //cubit.commentsNumber.isNotEmpty &&
+              cubit.likesNumber.isNotEmpty,
+          builder: (BuildContext context) {
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  //This section for creating new posts
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0, vertical: 10.0),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 25.0,
+                          backgroundImage: NetworkImage(
+                              '${cubit.userDataModel!.profileImage}'),
+                        ),
+                        const SizedBox(width: 10.0),
+                        TextButton(
+                          onPressed: () {
+                            navigateTo(
+                                context: context, widget: NewPostScreen());
+                          },
+                          child: Text(
+                            'Whats on your mind?',
+                            style: Theme.of(context).textTheme.bodyText1!,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  myDivider(),
+                  //This section for listing new stories
+                  Container(
+                    height: 202.0,
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          CircleAvatar(
-                            radius: 25.0,
-                            backgroundImage: NetworkImage(
-                                '${cubit.userDataModel!.profileImage}'),
-                          ),
+                          buildMyStoryItem(context),
                           const SizedBox(width: 10.0),
-                          TextButton(
-                            onPressed: () {
-                              navigateTo(
-                                  context: context, widget: NewPostScreen());
+                          ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            itemBuilder: (BuildContext context, int index) {
+                              return buildStoryItem(cubit.stories[index]);
                             },
-                            child: Text(
-                              'Whats on your mind?',
-                              style: Theme.of(context).textTheme.bodyText1!,
-                            ),
+                            separatorBuilder:
+                                (BuildContext context, int index) {
+                              return const SizedBox(width: 10.0);
+                            },
+                            itemCount: cubit.stories.length,
                           ),
                         ],
                       ),
                     ),
-                    myDivider(),
-                    //This section for listing new stories
-                    Container(
-                      height: 202.0,
-                      child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            buildMyStoryItem(context),
-                            const SizedBox(width: 10.0),
-                            ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              shrinkWrap: true,
-                              itemBuilder: (BuildContext context, int index) {
-                                return buildStoryItem(cubit.stories[index]);
-                              },
-                              separatorBuilder:
-                                  (BuildContext context, int index) {
-                                return const SizedBox(width: 10.0);
-                              },
-                              itemCount: cubit.stories.length,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    myDivider(),
-                    //This section for listing new posts
-                    ListView.separated(
-                      physics: const BouncingScrollPhysics(),
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (BuildContext context, int index) {
-                        return buildPostItem(
-                            context, cubit.posts[index], index);
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return myDivider();
-                      },
-                      itemCount: cubit.posts.length,
-                    ),
-                  ],
-                ),
-              );
-            },
-            fallback: (BuildContext context) {
-              return const Center(child: CircularProgressIndicator());
-            },
-          );
-        },
-      );
-    });
+                  ),
+                  myDivider(),
+                  //This section for listing new posts
+                  ListView.separated(
+                    physics: const BouncingScrollPhysics(),
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (BuildContext context, int index) {
+                      return buildPostItem(context, cubit.posts[index], index);
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return myDivider();
+                    },
+                    itemCount: cubit.posts.length,
+                  ),
+                ],
+              ),
+            );
+          },
+          fallback: (BuildContext context) {
+            return const Center(child: CircularProgressIndicator());
+          },
+        );
+      },
+    );
   }
 
   Widget buildMyStoryItem(BuildContext context) => Padding(
@@ -319,10 +316,9 @@ class FeedsScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text('0 Likes'),
-                const Spacer(),
-                Text('${AppCubit.get(context).commentsNumber[index]} Comments'),
+                Text('${AppCubit.get(context).likesNumber[index]} Likes'),
               ],
             ),
           ),
@@ -342,8 +338,8 @@ class FeedsScreen extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {
-                    //AppCubit.get(context)
-                    //.likePost(postId: AppCubit.get(context).postsId[index]);
+                    AppCubit.get(context)
+                        .likePost(postId: AppCubit.get(context).postsId[index]);
                   },
                   child: Row(
                     children: const [

@@ -40,7 +40,12 @@ class AppCubit extends Cubit<AppStates> {
   void changeBottomNavBar(int index) {
     currentIndex = index;
     getUsers();
+
     emit(ChangeBottomNavBarState());
+    if (currentIndex == 0) {
+      getPosts();
+      emit(ChangeBottomNavBarState());
+    }
   }
 
   void userLogin({
@@ -308,31 +313,63 @@ class AppCubit extends Cubit<AppStates> {
   List<int> commentsNumber = [];
   List likesNumber = [];
 
+  // void getPosts() {
+  //   posts = [];
+  //
+  //   FirebaseFirestore.instance
+  //       .collection('posts')
+  //       .orderBy('createAt', descending: true)
+  //       .get()
+  //       .then((value) {
+  //     value.docs.forEach((element) {
+  //       posts = [];
+  //
+  //       element.reference.collection('likes').get().then((value) {
+  //         posts.add(PostDataModel.fromJson(element.data()));
+  //         likesNumber.add(value.docs.length);
+  //         postsId.add(element.id);
+  //         print(posts.length);
+  //         emit(GetPostsSuccessState());
+  //       }).catchError((error) {});
+
+  // element.reference.collection('comments').get().then((value) {
+  //   commentsNumber.add(value.docs.length);
+  //   emit(GetPostsSuccessState());
+  // });
+  //     });
+  //     emit(GetPostsSuccessState());
+  //   }).catchError((error) {
+  //     emit(GetPostsErrorState(error.toString()));
+  //   });
+  // }
+
   void getPosts() {
     posts = [];
-
     FirebaseFirestore.instance
         .collection('posts')
         .orderBy('createAt', descending: true)
-        .get()
-        .then((value) {
-      value.docs.forEach((element) {
-        posts = [];
-
-        element.reference.collection('comments').get().then((value) {
-          posts.add(PostDataModel.fromJson(element.data()));
-          commentsNumber.add(value.docs.length);
-          postsId.add(element.id);
-
-          // element.reference.collection('likes').get().then((value) {
-          //   likesNumber.add(value.docs.length);
-          //   print(likesNumber);
-          // });
-        }).catchError((error) {});
-      });
+        .snapshots()
+        .listen((event) {
+      posts = [];
+      postsId = [];
+      commentsNumber = [];
+      likesNumber = [];
       emit(GetPostsSuccessState());
-    }).catchError((error) {
-      emit(GetPostsErrorState(error.toString()));
+      event.docs.forEach((element) {
+        element.reference.collection('likes').get().then((value) {
+          emit(GetPostsSuccessState());
+          likesNumber.add(value.docs.length);
+          postsId.add(element.id);
+          posts.add(PostDataModel.fromJson(element.data()));
+          // element.reference.collection('comments').get().then((value) {
+          //   commentsNumber.add(value.docs.length);
+          //   emit(GetPostsSuccessState());
+          // });
+        }).catchError((error) {
+          emit(GetPostsErrorState(error.toString()));
+        });
+        emit(GetPostsSuccessState());
+      });
     });
   }
 
