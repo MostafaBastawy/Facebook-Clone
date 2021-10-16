@@ -316,15 +316,7 @@ class FeedsScreen extends StatelessWidget {
               children: [
                 const Text('0 Likes'),
                 const Spacer(),
-                InkWell(
-                  onTap: () {
-                    navigateTo(
-                        context: context,
-                        widget: CommentScreen(
-                            AppCubit.get(context).postsId[index]));
-                  },
-                  child: const Text('0 Comments'),
-                ),
+                Text('${AppCubit.get(context).commentsNumber[index]} Comments'),
               ],
             ),
           ),
