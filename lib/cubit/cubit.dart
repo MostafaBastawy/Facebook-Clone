@@ -201,6 +201,7 @@ class AppCubit extends Cubit<AppStates> {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       coverImage = File(pickedFile.path);
+
       emit(PickProfileImageSuccessState());
       uploadCoverImage();
     } else {
@@ -305,6 +306,7 @@ class AppCubit extends Cubit<AppStates> {
   List<PostDataModel> posts = [];
   List<String> postsId = [];
   List<int> commentsNumber = [];
+  List likesNumber = [];
 
   void getPosts() {
     posts = [];
@@ -315,13 +317,18 @@ class AppCubit extends Cubit<AppStates> {
         .get()
         .then((value) {
       value.docs.forEach((element) {
+        posts = [];
+
         element.reference.collection('comments').get().then((value) {
+          posts.add(PostDataModel.fromJson(element.data()));
           commentsNumber.add(value.docs.length);
           postsId.add(element.id);
-          posts.add(PostDataModel.fromJson(element.data()));
+
+          // element.reference.collection('likes').get().then((value) {
+          //   likesNumber.add(value.docs.length);
+          //   print(likesNumber);
+          // });
         }).catchError((error) {});
-        //postsId.add(element.id);
-        //posts.add(PostDataModel.fromJson(element.data()));
       });
       emit(GetPostsSuccessState());
     }).catchError((error) {
