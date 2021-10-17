@@ -31,7 +31,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (BuildContext context) => AppCubit()
-        ..getUsers()
         ..getPosts()
         ..getStories(),
       child: MaterialApp(
