@@ -1,16 +1,40 @@
-# facebook_clone
+# noon_clone
 
-A new Flutter project.
+This is a full Social App. I made by using Firebase (Authentication, Firestore Database, Storage),and State Management (Bloc). This app give the user ability to share posts, share stories, chat with other users and edit his profile information & profile picture & cover Picture.
 
-## Getting Started
+## Tools
+- Authentication: Firebase Authentication
+- Backend: Firebase Firestore
+- State management:
+    - Bloc Design Pattern
 
-This project is a starting point for a Flutter application.
+- Packages:
+    - shared_preferences
+    - flutter_bloc
+    - bloc
+    - curved_navigation_bar
+    - firebase_auth
+    - firebase_core
+    - cloud_firestore
+    - firebase_storage
+    - image_picker
+    - intl
+    - conditional_builder_null_safety
+  
+## Screenshots
 
-A few resources to get you started if this is your first Flutter project:
+<table>
+  <tr>
+    <td><img src="lib/screen_shots/facebook1.jpg" width=270 height=480></td>
+    <td><img src="lib/screen_shots/facebook2.jpg" width=270 height=480></td>
+    <td><img src="lib/screen_shots/facebook3.jpg" width=270 height=480></td>
+  </tr>
+ </table>
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<table>
+  <tr>
+    <td><img src="lib/screen_shots/facebook4.jpg" width=270 height=480></td>
+    <td><img src="lib/screen_shots/facebook5.jpg" width=270 height=480></td>
+    <td><img src="lib/screen_shots/facebook6.jpg" width=270 height=480></td>
+  </tr>
+ </table>
