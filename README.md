@@ -23,11 +23,12 @@ This is a full Social App. I made by using Firebase (Authentication, Firestore D
 
 ## Video
 
+<!DOCTYPE html>
 <html>
 <body>
 
 <video width="320" height="240" controls>
-  <source src="lib/screen_shots/facebook_tutorial.mp4">
+  <source src="https://user-images.githubusercontent.com/81096412/139437191-0541077e-7405-428d-a62c-af63a8300d4b.mp4">
 </video>
 
 </body>
