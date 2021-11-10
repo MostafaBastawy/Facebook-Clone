@@ -1,3 +1,4 @@
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:facebook_clone/cubit/cubit.dart';
 import 'package:facebook_clone/cubit/states.dart';
 import 'package:facebook_clone/screens/edit_profile_screen.dart';
@@ -94,11 +95,17 @@ class ProfileScreen extends StatelessWidget {
                         text: 'Edit Profile'),
                     SizedBox(
                         height: MediaQuery.of(context).size.height * 0.018),
-                    defaultButton(
-                        function: () {
-                          cubit.signOut();
-                        },
-                        text: 'Logout'),
+                    ConditionalBuilder(
+                      condition: state is! UserSignOutLoadingState,
+                      builder: (BuildContext context) => defaultButton(
+                          function: () {
+                            cubit.signOut();
+                          },
+                          text: 'Logout'),
+                      fallback: (BuildContext context) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
                   ],
                 ),
               ),

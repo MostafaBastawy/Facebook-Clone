@@ -52,6 +52,7 @@ class AppCubit extends Cubit<AppStates> {
     required String email,
     required String password,
   }) {
+    emit(UserLoginLoadingState());
     FirebaseAuth.instance
         .signInWithEmailAndPassword(email: email, password: password)
         .then((value) {
@@ -70,6 +71,7 @@ class AppCubit extends Cubit<AppStates> {
     required String password,
     required String phone,
   }) {
+    emit(UserRegisterLoadingState());
     FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: password)
         .then((value) {
@@ -110,6 +112,7 @@ class AppCubit extends Cubit<AppStates> {
   }
 
   void signOut() {
+    emit(UserSignOutLoadingState());
     FirebaseAuth.instance.signOut().then((value) {
       emit(UserSignOutSuccessState());
       CacheHelper.removeData(key: 'uid');
@@ -313,36 +316,6 @@ class AppCubit extends Cubit<AppStates> {
   List<int> commentsNumber = [];
   List likesNumber = [];
 
-  // void getPosts() {
-  //   posts = [];
-  //
-  //   FirebaseFirestore.instance
-  //       .collection('posts')
-  //       .orderBy('createAt', descending: true)
-  //       .get()
-  //       .then((value) {
-  //     value.docs.forEach((element) {
-  //       posts = [];
-  //
-  //       element.reference.collection('likes').get().then((value) {
-  //         posts.add(PostDataModel.fromJson(element.data()));
-  //         likesNumber.add(value.docs.length);
-  //         postsId.add(element.id);
-  //         print(posts.length);
-  //         emit(GetPostsSuccessState());
-  //       }).catchError((error) {});
-
-  // element.reference.collection('comments').get().then((value) {
-  //   commentsNumber.add(value.docs.length);
-  //   emit(GetPostsSuccessState());
-  // });
-  //     });
-  //     emit(GetPostsSuccessState());
-  //   }).catchError((error) {
-  //     emit(GetPostsErrorState(error.toString()));
-  //   });
-  // }
-
   void getPosts() {
     posts = [];
     FirebaseFirestore.instance
@@ -356,6 +329,7 @@ class AppCubit extends Cubit<AppStates> {
       likesNumber = [];
       emit(GetPostsSuccessState());
       event.docs.forEach((element) {
+        posts = [];
         element.reference.collection('likes').get().then((value) {
           emit(GetPostsSuccessState());
           likesNumber.add(value.docs.length);

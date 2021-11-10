@@ -4,6 +4,8 @@ class InitialState extends AppStates {}
 
 class ChangeBottomNavBarState extends AppStates {}
 
+class UserLoginLoadingState extends AppStates {}
+
 class UserLoginSuccessState extends AppStates {}
 
 class UserLoginErrorState extends AppStates {
@@ -11,6 +13,8 @@ class UserLoginErrorState extends AppStates {
 
   UserLoginErrorState(this.error);
 }
+
+class UserRegisterLoadingState extends AppStates {}
 
 class UserRegisterSuccessState extends AppStates {}
 
@@ -27,6 +31,8 @@ class CreateUserErrorState extends AppStates {
 
   CreateUserErrorState(this.error);
 }
+
+class UserSignOutLoadingState extends AppStates {}
 
 class UserSignOutSuccessState extends AppStates {}
 

@@ -1,7 +1,10 @@
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:facebook_clone/cubit/cubit.dart';
 import 'package:facebook_clone/cubit/states.dart';
 import 'package:facebook_clone/screens/login_screen.dart';
 import 'package:facebook_clone/shared/components.dart';
+import 'package:facebook_clone/shared/form_field_validator.dart';
+import 'package:facebook_clone/shared/show_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,7 +20,15 @@ class RegisterScreen extends StatelessWidget {
     return BlocConsumer<AppCubit, AppStates>(
       listener: (BuildContext context, state) {
         if (state is UserRegisterSuccessState) {
+          defaultToast(
+            message: 'Account has been created successfully',
+            color: Colors.green,
+            context: context,
+          );
           navigateAndFinish(context: context, widget: LoginScreen());
+        }
+        if (state is UserRegisterErrorState) {
+          defaultToast(message: state.error.substring(30), color: Colors.red);
         }
       },
       builder: (BuildContext context, Object? state) {
@@ -35,6 +46,7 @@ class RegisterScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(20.0),
                 child: Form(
                   key: formKey,
+                  autovalidateMode: AutovalidateMode.always,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -51,11 +63,7 @@ class RegisterScreen extends StatelessWidget {
                       TextFormField(
                         controller: nameController,
                         keyboardType: TextInputType.name,
-                        validator: (String? value) {
-                          if (value!.isEmpty) {
-                            return 'name cant be empty';
-                          }
-                        },
+                        validator: FormFieldValidate.fullNameValidator,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'User Name',
@@ -70,9 +78,13 @@ class RegisterScreen extends StatelessWidget {
                       TextFormField(
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
-                        validator: (String? value) {
+                        validator: (value) {
                           if (value!.isEmpty) {
-                            'email cant be empty';
+                            return 'field is empty';
+                          }
+                          String pattern = r'\w+@\w+\.\w+';
+                          if (!RegExp(pattern).hasMatch(value)) {
+                            return 'invalid email address format';
                           }
                         },
                         decoration: const InputDecoration(
@@ -90,9 +102,14 @@ class RegisterScreen extends StatelessWidget {
                         obscureText: true,
                         controller: passwordController,
                         keyboardType: TextInputType.visiblePassword,
-                        validator: (String? value) {
+                        validator: (value) {
                           if (value!.isEmpty) {
-                            return 'password is too short';
+                            return 'field is empty';
+                          }
+                          String pattern =
+                              r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
+                          if (!RegExp(pattern).hasMatch(value)) {
+                            return 'invalid password format';
                           }
                         },
                         decoration: const InputDecoration(
@@ -109,9 +126,14 @@ class RegisterScreen extends StatelessWidget {
                       TextFormField(
                         controller: phoneController,
                         keyboardType: TextInputType.phone,
-                        validator: (String? value) {
+                        validator: (value) {
                           if (value!.isEmpty) {
-                            return 'phone cant be empty';
+                            return 'field is empty';
+                          }
+                          String pattern =
+                              r'\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$';
+                          if (!RegExp(pattern).hasMatch(value)) {
+                            return 'invalid phone number format';
                           }
                         },
                         decoration: const InputDecoration(
@@ -125,18 +147,24 @@ class RegisterScreen extends StatelessWidget {
                       ),
                       SizedBox(
                           height: MediaQuery.of(context).size.height * 0.03),
-                      defaultButton(
-                        function: () {
-                          if (formKey.currentState!.validate()) {
-                            cubit.userRegister(
-                              name: nameController.text,
-                              email: emailController.text,
-                              password: passwordController.text,
-                              phone: phoneController.text,
-                            );
-                          }
-                        },
-                        text: 'Register',
+                      ConditionalBuilder(
+                        condition: state is! UserRegisterLoadingState,
+                        builder: (BuildContext context) => defaultButton(
+                          function: () {
+                            if (formKey.currentState!.validate()) {
+                              cubit.userRegister(
+                                name: nameController.text,
+                                email: emailController.text,
+                                password: passwordController.text,
+                                phone: phoneController.text,
+                              );
+                            }
+                          },
+                          text: 'Register',
+                        ),
+                        fallback: (BuildContext context) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
                       ),
                       SizedBox(
                           height: MediaQuery.of(context).size.height * 0.05),
